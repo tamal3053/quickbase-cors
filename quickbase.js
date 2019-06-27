@@ -735,10 +735,10 @@ const actions = {
 		// response(query, results) { }
 	// },
 	API_Authenticate: {
-		request(query) {
+		// request(query) {
 			// API_Authenticate can only happen over SSL
 			// query.settings.useSSL = true;
-		},
+		// },
 		response(query, results) {
 			query.parent.settings.ticket = results.ticket;
 			query.parent.settings.username = query.options.username;
