@@ -737,7 +737,7 @@ const actions = {
 	API_Authenticate: {
 		request(query) {
 			// API_Authenticate can only happen over SSL
-			query.settings.useSSL = true;
+			// query.settings.useSSL = true;
 		},
 		response(query, results) {
 			query.parent.settings.ticket = results.ticket;
