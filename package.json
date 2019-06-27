@@ -1,0 +1,32 @@
+{
+  "name": "quickbase-cors",
+  "version": "2.10.4",
+  "description": "A lightweight, very flexible QuickBase API originally build by @tflanagan with edits to use proxy urls to resolve CORS issues in modern borwsers, clients and apps.",
+  "main": "quickbase.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tamal3053/quickbase-cors.git"
+  },
+  "keywords": [
+    "quickbase"
+  ],
+  "author": {
+    "name": "Tamal Dey",
+    "url": "https://github.com/tamal3053"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/tamal3053/quickbase-cors/issues"
+  },
+  "homepage": "https://github.com/tamal3053/quickbase-cors#readme",
+  "dependencies": {
+    "bluebird": "^3.5.5",
+    "debug": "^4.1.1",
+    "generic-throttle": "^1.3.0",
+    "lodash.merge": "^4.6.1",
+    "xml2js": "^0.4.19"
+  }
+}
