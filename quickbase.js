@@ -72,11 +72,12 @@ class QuickBaseError extends Error {
 /* Default Settings */
 const defaults = {
 	proxy: 'localhost',
-	port: '1337',
+	port: '443',
 	realm: 'www',
 	domain: 'quickbase.com',
 	path: '/',
 	useSSL: true,
+	addProtocol: false,
 
 	username: '',
 	password: '',
@@ -547,7 +548,7 @@ class QueryBuilder {
 			const options = merge({}, {
 				hostname: settings.proxy,
 				port: settings.port,
-				path: "/https://" + settings.realm + "." + settings.domain + settings.path + 'db/' + (this.options.dbid && !settings.flags.dbidAsParam ? this.options.dbid : 'main') + '?act=' + this.action + (!settings.flags.useXML ? this.payload : ''),
+				path: (settings.addProtocol ? "https://" : "") + "/" + settings.realm + "." + settings.domain + settings.path + 'db/' + (this.options.dbid && !settings.flags.dbidAsParam ? this.options.dbid : 'main') + '?act=' + this.action + (!settings.flags.useXML ? this.payload : ''),
 				method: settings.flags.useXML ? 'POST' : 'GET',
 				headers: {
 					'Content-Type': 'application/xml; charset=' + this.options.encoding,

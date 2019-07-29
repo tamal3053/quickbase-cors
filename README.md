@@ -1,14 +1,6 @@
 quickbase-cors
 ==============
 
-[![npm license](https://img.shields.io/npm/l/quickbase.svg)](https://www.npmjs.com/package/quickbase-cors) [![npm version](https://img.shields.io/npm/v/quickbase.svg)](https://www.npmjs.com/package/quickbase-cors) [![npm downloads](https://img.shields.io/npm/dm/quickbase.svg)](https://www.npmjs.com/package/quickbase-cors)
-
----
-
-### Originally Developed by Tristian Flanagan -> [tflanagan](https://github.com/tflanagan)
-
----
-
 A lightweight, very flexible QuickBase API
 
 [API Documentation](https://github.com/tflanagan/node-quickbase/blob/master/documentation/api.md)
@@ -20,6 +12,8 @@ Install
 ```
 # Latest Stable Release
 $ npm install quickbase-cors
+or 
+$ yarn add quickbase-cors
 ```
 
 Browserify
@@ -32,8 +26,9 @@ Example
 import QuickBase from "quickbase-cors";
 
 const quickbase = new QuickBase({
-    proxy: 'http://localhost',
-    post: '1337',
+    proxy: 'https://cors-anywhere.herokuapp.com',  // Set your PROXY URL here
+    port: '1337', // Set Your PORT address here.
+    addProtocol: false, // some proxy does not support protocol. If true https:// will be added.
 	realm: 'www',
 	appToken: '*****',
 	// userToken: '*****'
@@ -73,6 +68,13 @@ quickbase.api('API_Authenticate', {
 	console.error(err);
 });
 ```
+
+---
+
+### Originally Developed by Tristian Flanagan -> [tflanagan](https://github.com/tflanagan)
+
+---
+
 
 License
 -------
