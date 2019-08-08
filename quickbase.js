@@ -1,7 +1,7 @@
 /* Copyright 2019
  * Original Developer: Tristian Flanagan <https://github.com/tflanagan>
  * Updated by Tamal Dey
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -515,6 +515,7 @@ class QueryBuilder {
 
 	constructPayload() {
 		const builder = new xml.Builder({
+			cdata: true,
 			rootName: 'qdbapi',
 			xmldec: {
 				encoding: this.options.encoding
@@ -592,7 +593,8 @@ class QueryBuilder {
 			});
 
 			if (settings.flags.useXML === true) {
-				request.write(this.payload);
+				request.write(this.removeXMLInvalidChars(this.payload));
+				console.log(this.removeXMLInvalidChars(this.payload));
 			}
 
 			request.on('error', (err) => {
@@ -625,6 +627,35 @@ class QueryBuilder {
 		return this;
 	}
 
+
+	/**
+	 * Removes XML-invalid characters from a string.
+	 * @param {string} string - a string potentially containing XML-invalid characters, such as non-UTF8 characters, STX, EOX and so on.
+	 * @param {boolean} removeDiscouragedChars - a string potentially containing XML-invalid characters, such as non-UTF8 characters, STX, EOX and so on.
+	 * @return : a sanitized string without all the XML-invalid characters.
+	 */
+	removeXMLInvalidChars(string, removeDiscouragedChars = true) {
+		// remove everything forbidden by XML 1.0 specifications, plus the unicode replacement character U+FFFD
+		var regex = /((?:[\0-\x08\x0B\f\x0E-\x1F\uFFFD\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]))/g;
+		string = string.replace(regex, "");
+
+		if (removeDiscouragedChars) {
+			// remove everything not suggested by XML 1.0 specifications
+			regex = new RegExp(
+				"([\\x7F-\\x84]|[\\x86-\\x9F]|[\\uFDD0-\\uFDEF]|(?:\\uD83F[\\uDFFE\\uDFFF])|(?:\\uD87F[\\uDF"+
+				"FE\\uDFFF])|(?:\\uD8BF[\\uDFFE\\uDFFF])|(?:\\uD8FF[\\uDFFE\\uDFFF])|(?:\\uD93F[\\uDFFE\\uD"+
+				"FFF])|(?:\\uD97F[\\uDFFE\\uDFFF])|(?:\\uD9BF[\\uDFFE\\uDFFF])|(?:\\uD9FF[\\uDFFE\\uDFFF])"+
+				"|(?:\\uDA3F[\\uDFFE\\uDFFF])|(?:\\uDA7F[\\uDFFE\\uDFFF])|(?:\\uDABF[\\uDFFE\\uDFFF])|(?:\\"+
+				"uDAFF[\\uDFFE\\uDFFF])|(?:\\uDB3F[\\uDFFE\\uDFFF])|(?:\\uDB7F[\\uDFFE\\uDFFF])|(?:\\uDBBF"+
+				"[\\uDFFE\\uDFFF])|(?:\\uDBFF[\\uDFFE\\uDFFF])(?:[\\0-\\t\\x0B\\f\\x0E-\\u2027\\u202A-\\uD7FF\\"+
+				"uE000-\\uFFFF]|[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|[\\uD800-\\uDBFF](?![\\uDC00-\\uDFFF])|"+
+				"(?:[^\\uD800-\\uDBFF]|^)[\\uDC00-\\uDFFF]))", "g");
+			string = string.replace(regex, "");
+		}
+
+		return string;
+	}
+
 }
 
 /* XML Node Parsers */
@@ -647,7 +678,6 @@ const xmlNodeParsers = {
 			if (value.hasOwnProperty('choices_luid')) {
 				value.choices_luid = xmlNodeParsers.choices_luid(value.choices_luid);
 			}
-
 			return value;
 		});
 	},
@@ -703,42 +733,42 @@ const xmlNodeParsers = {
 const actions = {
 
 	/* NOTICE:
-	 * When an actions request or response does nothing, comment the function out.
-	 * Will increase performance by cutting out an unnecessary function execution.
-	*/
+     * When an actions request or response does nothing, comment the function out.
+     * Will increase performance by cutting out an unnecessary function execution.
+    */
 
 	// API_AddField: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_AddGroupToRole: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_AddRecord: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) {},
+	// response(query, results) { }
 	// },
 	// API_AddReplaceDBPage: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_AddSubGroup: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_AddUserToGroup: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_AddUserToRole: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	API_Authenticate: {
 		// request(query) {
-			// API_Authenticate can only happen over SSL
-			// query.settings.useSSL = true;
+		// API_Authenticate can only happen over SSL
+		// query.settings.useSSL = true;
 		// },
 		response(query, results) {
 			query.parent.settings.ticket = results.ticket;
@@ -747,60 +777,60 @@ const actions = {
 		}
 	},
 	// API_ChangeGroupInfo: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_ChangeManager: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_ChangeRecordOwner: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_ChangeUserRole: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_CloneDatabase: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_CopyGroup: {
-		// request(query) { },
-		// response(query, results) {  }
+	// request(query) { },
+	// response(query, results) {  }
 	// },
 	// API_CopyMasterDetail: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_CreateDatabase: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_CreateGroup: {
-		// request(query) { },
-		// response(query, results) {  }
+	// request(query) { },
+	// response(query, results) {  }
 	// },
 	// API_CreateTable: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_DeleteDatabase: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_DeleteField: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_DeleteGroup: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_DeleteRecord: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	API_DoQuery: {
 		request(query) {
@@ -819,26 +849,26 @@ const actions = {
 		response(query, results) {
 			if (query.options.hasOwnProperty('fmt') && query.options.fmt === 'structured') {
 				/* XML is _so_ butt ugly... Let's try to make some sense of it
-				 * Turn this:
-				 *  {
-				 *    $: { rid: 1 },
-				 *    f: [
-				 *      { $: { id: 3 }, _: 1 } ],
-				 *      { $: { id: 6 }, _: 'Test Value' }
-				 *      { $: { id: 7 }, _: 'filename.png', url: 'https://www.quickbase.com/' }
-				 *    ]
-				 *  }
-				 *
-				 * Into this:
-				 *  {
-				 *    3: 1,
-				 *    6: 'Test Value',
-				 *    7: {
-				 *      filename: 'filename.png',
-				 *      url: 'https://www.quickbase.com/'
-				 *    }
-				 *  }
-				*/
+                 * Turn this:
+                 *  {
+                 *    $: { rid: 1 },
+                 *    f: [
+                 *      { $: { id: 3 }, _: 1 } ],
+                 *      { $: { id: 6 }, _: 'Test Value' }
+                 *      { $: { id: 7 }, _: 'filename.png', url: 'https://www.quickbase.com/' }
+                 *    ]
+                 *  }
+                 *
+                 * Into this:
+                 *  {
+                 *    3: 1,
+                 *    6: 'Test Value',
+                 *    7: {
+                 *      filename: 'filename.png',
+                 *      url: 'https://www.quickbase.com/'
+                 *    }
+                 *  }
+                */
 
 				if (results.table.hasOwnProperty('records')) {
 					results.table.records = QuickBase.checkIsArrAndConvert(results.table.records).map((record) => {
@@ -908,36 +938,36 @@ const actions = {
 		}
 	},
 	// API_DoQueryCount: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_EditRecord: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_FieldAddChoices: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_FieldRemoveChoices: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_FindDBByName: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_GenAddRecordForm: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_GenResultsTable: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_GetAncestorInfo: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	API_GetAppDTMInfo: {
 		request(query) {
@@ -950,16 +980,16 @@ const actions = {
 		}
 	},
 	// API_GetDBPage: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_GetDBInfo: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_GetDBVar: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	API_GetGroupRole: {
 		// request(query) { },
@@ -970,8 +1000,8 @@ const actions = {
 		}
 	},
 	// API_GetNumRecords: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	API_GetSchema: {
 		// request(query) { },
@@ -999,12 +1029,12 @@ const actions = {
 		}
 	},
 	// API_GetRecordAsHTML: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_GetRecordInfo: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	API_GetRoleInfo: {
 		// request(query) { },
@@ -1015,8 +1045,8 @@ const actions = {
 		}
 	},
 	// API_GetUserInfo: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	API_GetUserRole: {
 		// request(query) { },
@@ -1027,8 +1057,8 @@ const actions = {
 		}
 	},
 	// API_GetUsersInGroup: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	API_GrantedDBs: {
 		// request(query) { },
@@ -1093,56 +1123,56 @@ const actions = {
 		}
 	},
 	// API_ProvisionUser: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_PurgeRecords: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_RemoveGroupFromRole: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_RemoveSubgroup: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_RemoveUserFromGroup: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_RemoveUserFromRole: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_RenameApp: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_RunImport: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_SendInvitation: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_SetDBVar: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_SetFieldProperties: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_SetKeyField: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	// API_SignOut: {
-		// request(query) { },
-		// response(query, results) { }
+	// request(query) { },
+	// response(query, results) { }
 	// },
 	API_UploadFile: {
 		// request(query) { },
@@ -1166,12 +1196,12 @@ const actions = {
 	},
 	default: {
 		/* request(query) {
-		 *  Do stuff prior to the request
-		 * },
-		 * response(query, results) {
-		 *  Do Stuff with the results before resolving the api call
-		 * }
-		*/
+         *  Do stuff prior to the request
+         * },
+         * response(query, results) {
+         *  Do Stuff with the results before resolving the api call
+         * }
+        */
 	}
 };
 
@@ -1179,9 +1209,9 @@ const actions = {
 const prepareOptions = {
 
 	/* NOTICE:
-	 * When an option is a simple return of the value given, comment the function out.
-	 * This will increase performance, cutting out an unnecessary function execution.
-	*/
+     * When an option is a simple return of the value given, comment the function out.
+     * This will increase performance, cutting out an unnecessary function execution.
+    */
 
 	/* Common to All */
 	// apptoken (val) { return val; },
