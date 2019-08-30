@@ -594,7 +594,6 @@ class QueryBuilder {
 
 			if (settings.flags.useXML === true) {
 				request.write(this.removeXMLInvalidChars(this.payload));
-				console.log(this.removeXMLInvalidChars(this.payload));
 			}
 
 			request.on('error', (err) => {
@@ -663,7 +662,7 @@ const xmlNodeParsers = {
 	choices_luid(val) {
 		return val.choice_luid;
 	},
-	fields(val) {
+	fields(val) {6
 		return QuickBase.checkIsArrAndConvert(val).map((value) => {
 			// Support Case #480141
 			// XML returned from QuickBase inserts '<br />' after every line in formula fields.
