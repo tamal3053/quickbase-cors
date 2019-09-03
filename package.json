@@ -1,6 +1,6 @@
 {
   "name": "quickbase-cors",
-  "version": "2.11.4",
+  "version": "2.11.5",
   "description": "A lightweight, very flexible QuickBase API originally build by @tflanagan with edits to use proxy urls to resolve CORS issues in modern borwsers, clients and apps.",
   "main": "quickbase.js",
   "scripts": {
