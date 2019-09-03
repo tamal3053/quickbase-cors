@@ -546,10 +546,21 @@ class QueryBuilder {
 		return new Promise((resolve, reject) => {
 			const settings = this.settings;
 			const protocol = settings.useSSL ? https : http;
+
+			let path = (settings.addProtocol ? "https://" : "") + "/" + settings.realm + "." + settings.domain + settings.path + 'db/' + (this.options.dbid && !settings.flags.dbidAsParam ? this.options.dbid : 'main') + '?act=' + this.action + (!settings.flags.useXML ? this.payload : '');
+
+			let hostname = settings.proxy;
+
+			if (hostname === "") {
+				hostname = settings.realm + "." + settings.domain;
+
+				path = '/db/' + (this.options.dbid && !settings.flags.dbidAsParam ? this.options.dbid : 'main') + '?act=' + this.action + (!settings.flags.useXML ? this.payload : '');
+			}
+
 			const options = merge({}, {
-				hostname: settings.proxy,
+				hostname: hostname,
 				port: settings.port,
-				path: (settings.addProtocol ? "https://" : "") + "/" + settings.realm + "." + settings.domain + settings.path + 'db/' + (this.options.dbid && !settings.flags.dbidAsParam ? this.options.dbid : 'main') + '?act=' + this.action + (!settings.flags.useXML ? this.payload : ''),
+				path: path,
 				method: settings.flags.useXML ? 'POST' : 'GET',
 				headers: {
 					'Content-Type': 'application/xml; charset=' + this.options.encoding,
@@ -663,7 +674,7 @@ const xmlNodeParsers = {
 	choices_luid(val) {
 		return val.choice_luid;
 	},
-	fields(val) {6
+	fields(val) {
 		return QuickBase.checkIsArrAndConvert(val).map((value) => {
 			// Support Case #480141
 			// XML returned from QuickBase inserts '<br />' after every line in formula fields.
