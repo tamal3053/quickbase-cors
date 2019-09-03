@@ -560,7 +560,8 @@ class QueryBuilder {
 
 			const request = protocol.request(options, (response) => {
 				let xmlResponse = '';
-
+				response.setEncoding("binary");
+				
 				response.on('data', (chunk) => {
 					xmlResponse += chunk;
 				});
