@@ -78,7 +78,7 @@ const defaults = {
 	path: '/',
 	useSSL: true,
 	addProtocol: false,
-
+	keepAlive: false,
 	username: '',
 	password: '',
 	appToken: '',
@@ -557,7 +557,7 @@ class QueryBuilder {
 				path = '/db/' + (this.options.dbid && !settings.flags.dbidAsParam ? this.options.dbid : 'main') + '?act=' + this.action + (!settings.flags.useXML ? this.payload : '');
 			}
 
-			const options = merge({}, {
+			let options = merge({}, {
 				hostname: hostname,
 				port: settings.port,
 				path: path,
@@ -569,6 +569,11 @@ class QueryBuilder {
 				agent: false
 			}, this.parent.settings.reqOptions);
 
+			if(settings.keepAlive){
+				const keepAliveAgent = new protocol.Agent({ keepAlive: true });
+				options.agent = keepAliveAgent;
+			}
+			
 			const request = protocol.request(options, (response) => {
 				let xmlResponse = '';
 				response.setEncoding("binary");
@@ -890,17 +895,18 @@ const actions = {
 						}
 
 						return QuickBase.checkIsArrAndConvert(record.f).reduce((ret, field) => {
-							const fid = field.id;
+							if (field) {
+								const fid = field.id;
 
-							if (field.hasOwnProperty('url')) {
-								ret[fid] = {
-									filename: field._,
-									url: field.url
-								};
-							} else {
-								ret[fid] = field._;
+								if (field.hasOwnProperty('url')) {
+									ret[fid] = {
+										filename: field._,
+										url: field.url
+									};
+								} else {
+									ret[fid] = field._;
+								}
 							}
-
 							return ret;
 						}, ret);
 					});
@@ -915,7 +921,8 @@ const actions = {
 				}
 
 				if (results.table.hasOwnProperty('variables')) {
-					results.table.variables = xmlNodeParsers.variables(results.table.variables);
+					if (results.table.variables.var)
+						results.table.variables = xmlNodeParsers.variables(results.table.variables);
 				}
 
 				if (results.table.hasOwnProperty('lusers')) {
